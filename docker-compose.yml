@@ -1,6 +1,6 @@
 ---
 # Shared Infrastructure Stack — Traefik + MariaDB + Redis + MailHog
-# Provides the infra-public network that app stacks (e.g., docker-msdev) connect to in backbone mode.
+# Provides the infra-public network that app stacks connect to in backbone mode.
 #
 # Usage:
 #   make up        # start infra stack
@@ -39,9 +39,9 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${DB_NAME:-msdev}
-      MYSQL_USER: ${DB_USER:-wordpress}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-wordpress}
+      MYSQL_DATABASE: ${DB_NAME:-appdb}
+      MYSQL_USER: ${DB_USER:-appuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-apppassword}
     ports:
       - "3307:3306"
     volumes:
@@ -63,7 +63,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mailhog.rule=Host(`mail.${SITE_DOMAIN:-msdev.com}`)"
+      - "traefik.http.routers.mailhog.rule=Host(`mail.${SITE_DOMAIN:-localhost}`)"
       - "traefik.http.routers.mailhog.entrypoints=websecure"
       - "traefik.http.routers.mailhog.tls=true"
       - "traefik.http.services.mailhog.loadbalancer.server.port=8025"

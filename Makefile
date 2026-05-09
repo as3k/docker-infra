@@ -9,7 +9,7 @@ up: ## Start the shared infra stack
 	@echo "  Traefik    dashboard: http://localhost:8888"
 	@echo "  MariaDB    port 3307 (localhost) / infra-mariadb (internal)"
 	@echo "  Redis      infra-redis:6379"
-	@echo "  MailHog    https://mail.$(shell grep SITE_DOMAIN .env 2>/dev/null | cut -d= -f2 || echo "msdev.com")"
+	@echo "  MailHog    https://mail.$(shell grep SITE_DOMAIN .env 2>/dev/null | cut -d= -f2 || echo '<your-domain>')"
 
 down: ## Stop the shared infra stack
 	$(COMPOSE) down
@@ -30,7 +30,7 @@ setup: ## First-time setup — create .env and generate TLS cert
 		echo "  .env created from .env.example — review and edit if needed."; \
 	fi
 	@if command -v openssl >/dev/null 2>&1; then \
-		SITE_DOMAIN=$$(grep SITE_DOMAIN .env | cut -d= -f2 || echo "msdev.com"); \
+		SITE_DOMAIN=$$(grep SITE_DOMAIN .env | cut -d= -f2 || echo "localhost"); \
 		openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
 			-keyout certs/node.key \
 			-out    certs/node.crt \
