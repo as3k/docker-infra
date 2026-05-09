@@ -6,9 +6,9 @@ Start it once. Every project on your machine connects to it. No more running fiv
 
 ## Why This Exists
 
-I work on multiple projects that all need a database, cache, reverse proxy, and email catcher. Every project used to bundle its own — five MariaDB containers, five Redis containers, five Traefik instances all fighting for ports 80 and 443. It was slow, wasteful, and I kept losing track of which database had my test data.
+I work on multiple projects that all need a database, cache, reverse proxy, and email catcher. Every project used to bundle its own. Five MariaDB containers. Five Redis containers. Five Traefik instances all fighting for ports 80 and 443. It was slow, wasteful, and I kept losing track of which database had my test data.
 
-This stack centralizes all of that. One MariaDB. One Redis. One Traefik. Projects connect over a shared Docker network and use their own database names to stay isolated. Start it in the morning, forget about it. Your app projects become lighter — just a web server and your code.
+This stack centralizes all of that. One MariaDB. One Redis. One Traefik. Projects connect over a shared Docker network and use their own database names to stay isolated. Start it in the morning, forget about it. Your app projects become lighter. Just a web server and your code.
 
 ---
 
@@ -32,10 +32,10 @@ Six Docker containers on the `infra-public` network. Your projects join this net
 | Service | Container name | What it does |
 |---------|---------------|--------------|
 | **Traefik** | `infra-traefik` | Routes `*.dev.local` domains to your app containers. Auto-TLS. |
-| **MariaDB** | `infra-mariadb` | Database server — WordPress, PHP apps, etc. |
-| **PostgreSQL** | `infra-postgres` | Database server — Django, Rails, Supabase, etc. |
+| **MariaDB** | `infra-mariadb` | Database server for WordPress, PHP apps, and more. |
+| **PostgreSQL** | `infra-postgres` | Database server for Django, Rails, Supabase, and more. |
 | **Redis** | `infra-redis` | Cache / session store. Speeds up your app. |
-| **CloudBeaver** | `infra-cloudbeaver` | Web UI for browsing databases — one tool for MariaDB + Postgres. |
+| **CloudBeaver** | `infra-cloudbeaver` | Web UI for browsing both MariaDB and Postgres in one place. |
 | **MailHog** | `infra-mailhog` | Catches outgoing email so you can inspect it without sending real mail. |
 
 ---
@@ -92,7 +92,7 @@ Services are exposed on non-standard ports to avoid conflicts with local install
 | PostgreSQL | `appuser` | `apppassword` | — |
 | Redis | — | `redispassword` | — |
 
-MailHog accepts everything — no auth needed.
+MailHog accepts everything with no auth needed.
 
 ### CloudBeaver first-time setup
 
@@ -124,7 +124,7 @@ Run these from any container on the `infra-public` network, or use CloudBeaver's
 All config goes in `.env`. Created by `make setup`, edit anytime.
 
 ```env
-SITE_DOMAIN=dev.local        # Traefik routes use this — *.dev.local
+SITE_DOMAIN=dev.local        # Traefik routes use this domain, for example *.dev.local
 DB_USER=appuser              # MariaDB user
 DB_PASSWORD=apppassword      # MariaDB password
 PG_USER=appuser              # PostgreSQL user
@@ -140,7 +140,7 @@ Change these if your app expects different values.
 
 | Command | What it does |
 |---------|-------------|
-| `make setup` | First run only — creates `.env`, generates TLS cert |
+| `make setup` | First run only. Creates `.env` and generates TLS cert. |
 | `make up` | Start all services |
 | `make down` | Stop all services |
 | `make restart` | Restart everything |
@@ -152,7 +152,7 @@ Change these if your app expects different values.
 ## Common Questions
 
 **Do I need to start this every time I work?**
-Leave it running. Start/stop your app projects freely — they all share this stack.
+Leave it running. Start and stop your app projects freely. They all share this stack.
 
 **Port 80 or 443 is already in use.**
 Something else is on those ports (another Docker stack, nginx, Apache, etc.). Stop it first, then `make up`.
@@ -164,7 +164,7 @@ Something else is on those ports (another Docker stack, nginx, Apache, etc.). St
 Create a new one (see above) and point your app at it. No restart needed.
 
 **My app already has its own Docker Compose with MariaDB.**
-Remove those services from your app's compose file. In backbone mode, your app only needs its web server — the infra stack provides everything else.
+Remove those services from your app's compose file. In backbone mode, your app only needs its web server. The infra stack provides everything else.
 
 **Can I run multiple projects at once?**
 Yes. Each project gets its own database and Traefik hostname. Everything else is shared.
