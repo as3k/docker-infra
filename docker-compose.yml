@@ -1,0 +1,79 @@
+---
+# Shared Infrastructure Stack — Traefik + MariaDB + Redis + MailHog
+# Provides the infra-public network that app stacks (e.g., docker-msdev) connect to in backbone mode.
+#
+# Usage:
+#   make up        # start infra stack
+#   make down      # stop infra stack
+#   make setup     # first-time setup (.env + certs)
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: infra-traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=infra-public"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/certs:ro
+      - ./traefik-config:/etc/traefik/dynamic:ro
+    networks:
+      - infra-public
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: infra-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-msdev}
+      MYSQL_USER: ${DB_USER:-wordpress}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-wordpress}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - infra-public
+
+  redis:
+    image: redis:7-alpine
+    container_name: infra-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redispassword}
+    networks:
+      - infra-public
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: infra-mailhog
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailhog.rule=Host(`mail.${SITE_DOMAIN:-msdev.com}`)"
+      - "traefik.http.routers.mailhog.entrypoints=websecure"
+      - "traefik.http.routers.mailhog.tls=true"
+      - "traefik.http.services.mailhog.loadbalancer.server.port=8025"
+    networks:
+      - infra-public
+
+volumes:
+  mariadb-data:
+
+networks:
+  infra-public:
+    name: infra-public
+    driver: bridge
