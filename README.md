@@ -1,4 +1,4 @@
-# docker-infra
+# Drop Forge
 
 A shared stack of infrastructure services for local web development. Runs on Docker.
 
@@ -15,8 +15,8 @@ This stack centralizes all of that. One MariaDB. One Redis. One Traefik. Project
 ## Quick Start
 
 ```bash
-git clone git@github.com:as3k/docker-infra.git
-cd docker-infra
+git clone git@github.com:as3k/drop-forge.git
+cd drop-forge
 make setup     # one-time setup
 make up        # start everything
 ```
