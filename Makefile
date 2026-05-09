@@ -9,7 +9,8 @@ up: ## Start the shared infra stack
 	@echo "  Traefik    dashboard: http://localhost:8888"
 	@echo "  MariaDB    port 3307 (localhost) / infra-mariadb (internal)"
 	@echo "  Redis      infra-redis:6379"
-	@echo "  PostgreSQL  infra-postgres:5432 / localhost:5433"\n	@echo "  PostgreSQL  infra-postgres:5432 / localhost:5433"
+	@echo "  PostgreSQL  infra-postgres:5432 / localhost:5433"
+	@echo "  CloudBeaver  https://db.$(shell grep SITE_DOMAIN .env 2>/dev/null | cut -d= -f2 || echo '<your-domain>') / localhost:8978"
 	@echo "  MailHog    https://mail.$(shell grep SITE_DOMAIN .env 2>/dev/null | cut -d= -f2 || echo '<your-domain>')"
 
 down: ## Stop the shared infra stack

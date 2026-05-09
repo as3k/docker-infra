@@ -72,6 +72,23 @@ services:
     networks:
       - infra-public
 
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: infra-cloudbeaver
+    restart: unless-stopped
+    ports:
+      - "8978:8978"
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cloudbeaver.rule=Host(`db.${SITE_DOMAIN:-localhost}`)"
+      - "traefik.http.routers.cloudbeaver.entrypoints=websecure"
+      - "traefik.http.routers.cloudbeaver.tls=true"
+      - "traefik.http.services.cloudbeaver.loadbalancer.server.port=8978"
+    networks:
+      - infra-public
+
   mailhog:
     image: mailhog/mailhog:latest
     container_name: infra-mailhog
@@ -88,6 +105,7 @@ services:
 volumes:
   mariadb-data:
   postgres-data:
+  cloudbeaver-data:
 
 networks:
   infra-public:

@@ -40,6 +40,7 @@ make up
 | MariaDB  | `infra-mariadb`  | `infra-mariadb` | 3306 | `localhost:3307` |
 | Redis    | `infra-redis`    | `infra-redis` | 6379 | — (internal only) |
 | PostgreSQL | `infra-postgres` | `infra-postgres` | 5432 | `localhost:5433` |
+| CloudBeaver | `infra-cloudbeaver` | — | 8978 | `https://db.<your-domain>` (via Traefik), `localhost:8978` |
 | MailHog  | `infra-mailhog`  | — | 8025 (HTTP) | `https://mail.<your-domain>` (via Traefik) |
 
 ---
@@ -87,13 +88,33 @@ A self-signed wildcard TLS certificate is generated during `make setup` for `*.<
 | 443 | Traefik HTTPS | Conflicts with other web servers |
 | 3307 | MariaDB | 3307 avoids conflict with local MySQL |
 | 5433 | PostgreSQL | 5433 avoids conflict with local Postgres |
+| 8978 | CloudBeaver | Web DB manager — direct access on both |
 | 8888 | Traefik dashboard | HTTP only |
 
 If you have other services on ports 80/443 (like a standalone Docker stack running Traefik), stop them before starting this stack.
 
 ---
 
-## Multiple App Stacks
+## CloudBeaver (Database Manager)
+
+CloudBeaver provides a web UI for browsing and querying both MariaDB and PostgreSQL (plus any other databases on the `infra-public` network).
+
+### First-Time Setup
+
+1. Open `https://db.<your-domain>` (or `http://localhost:8978` for direct access)
+2. Create an admin account on first launch
+3. Add connections to the databases you want to manage:
+
+| Database | Host | Port | User | Password |
+|----------|------|------|------|----------|
+| MariaDB  | `infra-mariadb` | 3306 | `appuser` | `apppassword` |
+| PostgreSQL | `infra-postgres` | 5432 | `appuser` | `apppassword` |
+
+> Credentials above are the defaults from `.env.example`. If you changed `DB_USER`, `DB_PASSWORD`, `PG_USER`, or `PG_PASSWORD` in your `.env`, use those values instead.
+
+### Internal Hostnames
+
+All CloudBeaver connections use the **Docker internal hostname** (e.g., `infra-mariadb`, `infra-postgres`), not `localhost`. This works because CloudBeaver is on the same `infra-public` Docker network as the databases.
 
 You can connect multiple app stacks to a single infra stack. Each app stack needs:
 
