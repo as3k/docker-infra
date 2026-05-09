@@ -4,6 +4,12 @@ A shared stack of infrastructure services for local web development. Runs on Doc
 
 Start it once. Every project on your machine connects to it. No more running five databases because each project has its own.
 
+## Why This Exists
+
+I work on multiple projects that all need a database, cache, reverse proxy, and email catcher. Every project used to bundle its own — five MariaDB containers, five Redis containers, five Traefik instances all fighting for ports 80 and 443. It was slow, wasteful, and I kept losing track of which database had my test data.
+
+This stack centralizes all of that. One MariaDB. One Redis. One Traefik. Projects connect over a shared Docker network and use their own database names to stay isolated. Start it in the morning, forget about it. Your app projects become lighter — just a web server and your code.
+
 ---
 
 ## Quick Start
