@@ -39,6 +39,7 @@ make up
 | Traefik  | `infra-traefik`  | — | 80 / 443 | `localhost:80`, `localhost:443`, `localhost:8888` (dashboard) |
 | MariaDB  | `infra-mariadb`  | `infra-mariadb` | 3306 | `localhost:3307` |
 | Redis    | `infra-redis`    | `infra-redis` | 6379 | — (internal only) |
+| PostgreSQL | `infra-postgres` | `infra-postgres` | 5432 | `localhost:5433` |
 | MailHog  | `infra-mailhog`  | — | 8025 (HTTP) | `https://mail.<your-domain>` (via Traefik) |
 
 ---
@@ -85,6 +86,7 @@ A self-signed wildcard TLS certificate is generated during `make setup` for `*.<
 | 80 | Traefik HTTP → redirects to HTTPS | Conflicts with other web servers |
 | 443 | Traefik HTTPS | Conflicts with other web servers |
 | 3307 | MariaDB | 3307 avoids conflict with local MySQL |
+| 5433 | PostgreSQL | 5433 avoids conflict with local Postgres |
 | 8888 | Traefik dashboard | HTTP only |
 
 If you have other services on ports 80/443 (like a standalone Docker stack running Traefik), stop them before starting this stack.
